@@ -1,37 +1,21 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useImages } from '../context/ImagesContext';
 
 const Navbar = () => {
-  const [logo, setLogo] = useState(null);
-
-  useEffect(() => {
-    const fetchLogo = async () => {
-      try {
-        const response = await fetch('http://localhost:5001/api/logo');
-        const data = await response.json();
-        if (data && data.imageUrl) {
-          setLogo(data);
-        }
-      } catch (error) {
-        console.error('Error fetching logo:', error);
-      }
-    };
-
-    fetchLogo();
-  }, []);
+  const { images } = useImages();
 
   return (
     <nav className="navbar">
-      <Link to="/" className="logo">
-        {logo && (
+      <div className="logo">
+        {images.logo ? (
           <img 
-            src={`http://localhost:5001${logo.imageUrl}`} 
-            alt={logo.altText || 'School Logo'} 
-            className="logo-img"
+            src={`http://localhost:5001${images.logo.imageUrl}`} 
+            alt="School Logo" 
           />
+        ) : (
+          <span>Bright Stars Academy</span>
         )}
-        <h1>Great Destiny Moulders</h1>
-      </Link>
+      </div>
       <ul className="nav-links">
         <li><Link to="/">Home</Link></li>
         <li><Link to="/about">About Us</Link></li>

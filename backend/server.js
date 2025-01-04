@@ -10,6 +10,7 @@ const fs = require('fs');
 
 const Admin = require('./models/Admin');
 const Content = require('./models/Content');
+const Image = require('./models/Image');
 
 const app = express();
 
@@ -120,7 +121,87 @@ app.get('/api/logo', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
+app.delete('/api/logo', authMiddleware, async (req, res) => {
+  try {
+    const logo = await Content.findOne({ section: 'logo', isActive: true });
+    if (logo) {
+      const filePath = path.join(__dirname, logo.imageUrl);
+      fs.unlink(filePath, (err) => {
+        if (err) console.error('Error deleting file:', err);
+      });
+      await Content.deleteOne({ _id: logo._id });
+    }
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all images
+app.get('/api/images/all', async (req, res) => {
+  try {
+    const images = await Image.find({});
+    const imagesBySection = images.reduce((acc, img) => {
+      acc[img.section] = img;
+      return acc;
+    }, {});
+    res.json(imagesBySection);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Upload image
+app.post('/api/upload/image', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    const { section } = req.body;
+    const file = req.file;
+
+    if (!file) throw new Error('No file uploaded');
+
+    // Delete existing image for this section if it exists
+    const existingImage = await Image.findOne({ section });
+    if (existingImage) {
+      const filePath = path.join(__dirname, existingImage.imageUrl);
+      fs.unlink(filePath, (err) => {
+        if (err) console.error('Error deleting file:', err);
+      });
+      await Image.deleteOne({ _id: existingImage._id });
+    }
+
+    const image = new Image({
+      section,
+      imageUrl: `/uploads/${file.filename}`
+    });
+
+    await image.save();
+    res.json(image);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete image
+app.delete('/api/images/:section', authMiddleware, async (req, res) => {
+  try {
+    const { section } = req.params;
+    const image = await Image.findOne({ section });
+    
+    if (image) {
+      const filePath = path.join(__dirname, image.imageUrl);
+      fs.unlink(filePath, (err) => {
+        if (err) console.error('Error deleting file:', err);
+      });
+      await Image.deleteOne({ _id: image._id });
+    }
+    
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}); 
+
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

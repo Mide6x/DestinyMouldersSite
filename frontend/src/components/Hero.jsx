@@ -1,4 +1,8 @@
+import { useImages } from '../context/ImagesContext';
+
 const Hero = () => {
+  const { images } = useImages();
+
   return (
     <div className="hero-section">
       <div className="container">
@@ -9,9 +13,16 @@ const Hero = () => {
           <button className="enroll-btn">Begin Your Child&apos;s Journey</button>
         </div>
         <div className="hero-image">
-          <div className="image-placeholder">
-            School Building Image
-          </div>
+          {images.building ? (
+            <img 
+              src={`http://localhost:5001${images.building.imageUrl}`} 
+              alt="School Building" 
+            />
+          ) : (
+            <div className="placeholder-image">
+              School Building Image
+            </div>
+          )}
         </div>
       </div>
     </div>

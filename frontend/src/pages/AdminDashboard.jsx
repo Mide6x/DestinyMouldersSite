@@ -1,22 +1,106 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FiUploadCloud, FiTrash2, FiLogOut } from 'react-icons/fi';
 import imageCompression from 'browser-image-compression';
-import LoadingSpinner from '../components/LoadingSpinner';
 import Toast from '../components/Toast';
-import ProgressBar from '../components/ProgressBar';
-import '../styles/admin.css';
+
+const SECTIONS = {
+  logo: 'School Logo',
+  building: 'School Building',
+  creche: 'Creche',
+  preschool: 'Preschool',
+  nursery: 'Nursery',
+  kindergarten: 'Kindergarten',
+  primary: 'Primary',
+  afterSchool: 'After School'
+};
 
 const AdminDashboard = () => {
-  const [logo, setLogo] = useState(null);
-  const [preview, setPreview] = useState('');
+  const [images, setImages] = useState({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-  const [uploadProgress, setUploadProgress] = useState(0);
   const navigate = useNavigate();
 
-  const showToast = (message, type = 'success') => {
-    setToast({ show: true, message, type });
+  const fetchAllImages = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/images/all');
+      if (!response.ok) {
+        throw new Error('Failed to fetch images');
+      }
+      const data = await response.json();
+      setImages(data);
+    } catch (error) {
+      showToast('Error fetching images: ' + error.message, 'error');
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllImages();
+  }, [fetchAllImages]);
+
+  const handleFileSelect = async (event, section) => {
+    const file = event.target.files[0];
+    if (file) {
+      try {
+        validateImage(file);
+        const compressedFile = await compressImage(file);
+        await handleUpload(compressedFile, section);
+      } catch (error) {
+        showToast(error.message, 'error');
+      }
+    }
+  };
+
+  const handleUpload = async (file, section) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('section', section);
+
+    try {
+      const response = await fetch('http://localhost:5001/api/upload/image', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      showToast('Image uploaded successfully!');
+      await fetchAllImages();
+    } catch (error) {
+      showToast(error.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (section) => {
+    if (!window.confirm(`Are you sure you want to delete the ${SECTIONS[section]} image?`)) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5001/api/images/${section}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to delete image');
+      
+      showToast('Image deleted successfully!');
+      await fetchAllImages();
+    } catch (error) {
+      showToast(error.message, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const validateImage = (file) => {
@@ -45,109 +129,68 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleLogoUpload = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setError('');
-      try {
-        validateImage(file);
-        const compressedFile = await compressImage(file);
-        setLogo(compressedFile);
-        setPreview(URL.createObjectURL(compressedFile));
-      } catch (error) {
-        setError(error.message);
-        showToast(error.message, 'error');
-      }
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setUploadProgress(0);
-
-    const formData = new FormData();
-    formData.append('logo', logo);
-
-    try {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'http://localhost:5001/api/upload/logo');
-      xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('adminToken')}`);
-
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const progress = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress(progress);
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          showToast('Logo uploaded successfully!');
-          setLogo(null);
-          setPreview('');
-        } else {
-          throw new Error('Upload failed');
-        }
-        setLoading(false);
-      };
-
-      xhr.onerror = () => {
-        throw new Error('Network error occurred');
-      };
-
-      xhr.send(formData);
-    } catch (error) {
-      setError(error.message);
-      showToast(error.message, 'error');
-      setLoading(false);
-    }
+  const showToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
   };
 
   return (
     <div className="admin-dashboard">
-      {toast.show && (
-        <Toast 
-          message={toast.message} 
-          type={toast.type} 
-          onClose={() => setToast({ ...toast, show: false })} 
-        />
-      )}
+      <Toast message={toast.message} type={toast.type} 
+        onClose={() => setToast({ ...toast, show: false })} />
+      
       <div className="dashboard-header">
         <h1>Admin Dashboard</h1>
         <button onClick={() => {
           localStorage.removeItem('adminToken');
-          navigate('/admin/login');
+          navigate('/admin');
         }} className="logout-btn">
-          Logout
+          <FiLogOut /> Logout
         </button>
       </div>
       
-      <div className="upload-section">
-        <h2>Upload School Logo</h2>
-        {error && <div className="error-message">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="logo-preview">
-            {preview && <img src={preview} alt="Logo Preview" />}
+      <div className="sections-grid">
+        {Object.entries(SECTIONS).map(([key, title]) => (
+          <div key={key} className="section-card">
+            <h3>{title}</h3>
+            <div className="image-preview">
+              {images[key] ? (
+                <div className="image-container">
+                  <img src={`http://localhost:5001${images[key].imageUrl}`} alt={title} />
+                  <div className="image-actions">
+                    <label className="action-btn upload-btn">
+                      <FiUploadCloud />
+                      <input
+                        type="file"
+                        onChange={(e) => handleFileSelect(e, key)}
+                        accept="image/*"
+                        disabled={loading}
+                      />
+                    </label>
+                    <button 
+                      className="action-btn delete-btn"
+                      onClick={() => handleDelete(key)}
+                      disabled={loading}
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="upload-zone">
+                  <input
+                    type="file"
+                    onChange={(e) => handleFileSelect(e, key)}
+                    accept="image/*"
+                    disabled={loading}
+                  />
+                  <FiUploadCloud className="upload-icon" />
+                  <p>Click to upload</p>
+                </label>
+              )}
+            </div>
           </div>
-          <input 
-            type="file" 
-            onChange={handleLogoUpload}
-            accept="image/*"
-            disabled={loading}
-          />
-          {loading && <ProgressBar progress={uploadProgress} />}
-          <button 
-            type="submit" 
-            disabled={!logo || loading}
-            className={loading ? 'loading' : ''}
-          >
-            {loading ? 'Uploading...' : 'Upload Logo'}
-          </button>
-        </form>
+        ))}
       </div>
-      {loading && <LoadingSpinner />}
     </div>
   );
 };

@@ -1,8 +1,13 @@
+import { useImages } from '../context/ImagesContext';
+
 const Programs = () => {
+  const { images } = useImages();
+  
   const programs = [
     {
-      title: "Creche",
-      age: "3 months - 2 years",
+      key: 'creche',
+      title: 'Creche',
+      age: '3 months - 2 years',
       features: [
         "Nurturing Environment",
         "Early Childhood Development",
@@ -11,8 +16,9 @@ const Programs = () => {
       ]
     },
     {
-      title: "Preschool",
-      age: "2 - 3 years",
+      key: 'preschool',
+      title: 'Preschool',
+      age: '2 - 3 years',
       features: [
         "Montessori Learning",
         "Social Development",
@@ -21,8 +27,9 @@ const Programs = () => {
       ]
     },
     {
-      title: "Nursery",
-      age: "3 - 4 years",
+      key: 'nursery',
+      title: 'Nursery',
+      age: '3 - 4 years',
       features: [
         "Foundational Learning",
         "Phonics & Numbers",
@@ -31,8 +38,9 @@ const Programs = () => {
       ]
     },
     {
-      title: "Kindergarten",
-      age: "4 - 5 years",
+      key: 'kindergarten',
+      title: 'Kindergarten',
+      age: '4 - 5 years',
       features: [
         "Advanced Preparation",
         "Reading & Writing",
@@ -41,8 +49,9 @@ const Programs = () => {
       ]
     },
     {
-      title: "Primary",
-      age: "5 - 11 years",
+      key: 'primary',
+      title: 'Primary',
+      age: '5 - 11 years',
       features: [
         "Core Subjects",
         "Computer Studies",
@@ -51,8 +60,9 @@ const Programs = () => {
       ]
     },
     {
-      title: "After School",
-      age: "All ages",
+      key: 'afterSchool',
+      title: 'After School',
+      age: 'All ages',
       features: [
         "Homework Support",
         "Extra Learning",
@@ -67,8 +77,8 @@ const Programs = () => {
       <div className="container">
         <h2>Our Academic Programs</h2>
         <div className="programs-grid">
-          {programs.map((program, index) => (
-            <div className="program-card" key={index} style={{
+          {programs.map(({ key, title, age, features }, index) => (
+            <div className="program-card" key={key} style={{
               borderTop: `4px solid var(${
                 index === 0 ? '--yellow' :
                 index === 1 ? '--blue' :
@@ -78,18 +88,34 @@ const Programs = () => {
                 '--pink'
               })`
             }}>
-              <div className="program-image" style={{
-                width: '300px',
-                height: '200px',
-                backgroundColor: '#f0f0f0',
-                margin: '0 auto'
-              }}>
-                {program.title} Image
-              </div>
-              <h3>{program.title}</h3>
-              <p>Ages: {program.age}</p>
+              {images[key] ? (
+                <img 
+                  src={`http://localhost:5001${images[key].imageUrl}`} 
+                  alt={title} 
+                  style={{
+                    width: '300px',
+                    height: '200px',
+                    objectFit: 'cover',
+                    margin: '0 auto'
+                  }}
+                />
+              ) : (
+                <div className="placeholder-image" style={{
+                  width: '300px',
+                  height: '200px',
+                  backgroundColor: '#f0f0f0',
+                  margin: '0 auto',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {title} Image
+                </div>
+              )}
+              <h3>{title}</h3>
+              <p>Ages: {age}</p>
               <ul>
-                {program.features.map((feature, i) => (
+                {features.map((feature, i) => (
                   <li key={i}>{feature}</li>
                 ))}
               </ul>
