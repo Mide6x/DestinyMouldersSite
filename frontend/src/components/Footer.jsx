@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const Footer = () => {
   return (
     <footer className="footer">
@@ -5,9 +7,10 @@ const Footer = () => {
         <div className="footer-section">
           <h3>Quick Links</h3>
           <ul>
-            <li><a href="/about">About Us</a></li>
-            <li><a href="/admission">Admission</a></li>
-            <li><a href="/contact">Contact</a></li>
+            <li><Link to="/about">About Us</Link></li>
+            <li><Link to="/admission">Admission</Link></li>
+            <li><Link to="/contact">Contact</Link></li>
+            <li><Link to="/admin">Admin Login</Link></li>
           </ul>
         </div>
         
@@ -16,7 +19,7 @@ const Footer = () => {
           <p>📍 Archbishop Vining Memorial Church Cathedral, Oba Akinjobi Way, GRA, Ikeja</p>
           <p>📞 08062910315, 08062948130</p>
           <p>📞 08023160711, 08062766051</p>
-          <p>📧 info@brightstarsacademy.com</p>
+          <p>📧 info@greatdestinymoulders.com</p>
         </div>
 
         <div className="footer-section">
@@ -29,7 +32,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="footer-bottom">
-        <p>&copy; 2024 Bright Stars Academy. All rights reserved.</p>
+        <p>&copy; 2025 Great Destiny Moulders. All rights reserved.</p>
       </div>
     </footer>
   );

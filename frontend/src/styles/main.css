@@ -17,8 +17,9 @@ body {
 
 /* Global Colors */
 :root {
-  --primary-purple: #4A235A;
-  --secondary-purple: #8E44AD;
+  --primary-purple: #8B3E97;
+  --secondary-purple: #A65FB1;
+  --primary-dark: #6B2E74;
   --pink: #FFE4E8;
   --yellow: #FFD700;
   --blue: #2E86C1;
