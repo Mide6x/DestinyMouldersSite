@@ -13,12 +13,13 @@ const Navbar = () => {
             alt="School Logo" 
           />
         ) : (
-          <span>Bright Stars Academy</span>
+          <span>Great Destiny Moulders</span>
         )}
       </div>
       <ul className="nav-links">
         <li><Link to="/">Home</Link></li>
         <li><Link to="/about">About Us</Link></li>
+        <li><Link to="/leadership">Leadership</Link></li>
         <li><Link to="/programs">Academics</Link></li>
         <li><Link to="/facilities">Facilities</Link></li>
         <li><Link to="/admission">Admission</Link></li>

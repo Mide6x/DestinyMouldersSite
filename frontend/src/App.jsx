@@ -5,6 +5,7 @@ import ContactPage from './pages/ContactPage';
 import ProgramsPage from './pages/Programs';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import Leadership from './components/Leadership';
 import ProtectedRoute from './components/ProtectedRoute';
 import NotFound from './pages/NotFound';
 import './styles/main.css';
@@ -19,6 +20,7 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/programs" element={<ProgramsPage />} />
+          <Route path="/leadership" element={<Leadership />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route 
             path="/admin/dashboard" 

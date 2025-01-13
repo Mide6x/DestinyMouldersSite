@@ -16,10 +16,11 @@ const Footer = () => {
         
         <div className="footer-section">
           <h3>Contact Info</h3>
+          <p>🏢 Great Destiny Moulders Nursery and Primary School</p>
           <p>📍 Archbishop Vining Memorial Church Cathedral, Oba Akinjobi Way, GRA, Ikeja</p>
           <p>📞 08062910315, 08062948130</p>
           <p>📞 08023160711, 08062766051</p>
-          <p>📧 info@greatdestinymoulders.com</p>
+          <p>📧 greatdestinymoulders@gmail.com</p>
         </div>
 
         <div className="footer-section">
