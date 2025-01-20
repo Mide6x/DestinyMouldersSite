@@ -1,4 +1,4 @@
-import { useImages } from '../context/ImagesContext';
+import { useImages } from '../hooks/useImages';
 
 const Programs = () => {
   const { images } = useImages();
@@ -88,37 +88,27 @@ const Programs = () => {
                 '--pink'
               })`
             }}>
-              {images[key] ? (
-                <img 
-                  src={`http://localhost:5001${images[key].imageUrl}`} 
-                  alt={title} 
-                  style={{
-                    width: '300px',
-                    height: '200px',
-                    objectFit: 'cover',
-                    margin: '0 auto'
-                  }}
-                />
-              ) : (
-                <div className="placeholder-image" style={{
-                  width: '300px',
-                  height: '200px',
-                  backgroundColor: '#f0f0f0',
-                  margin: '0 auto',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  {title} Image
-                </div>
-              )}
-              <h3>{title}</h3>
-              <p>Ages: {age}</p>
-              <ul>
-                {features.map((feature, i) => (
-                  <li key={i}>{feature}</li>
-                ))}
-              </ul>
+              <div className="leader-image">
+                {images[key] ? (
+                  <img 
+                    src={images[key].imageUrl}
+                    alt={title} 
+                  />
+                ) : (
+                  <div className="placeholder-image">
+                    <span>{title}</span>
+                  </div>
+                )}
+              </div>
+              <div className="program-content">
+                <h3>{title}</h3>
+                <p className="age">Ages: {age}</p>
+                <ul className="features">
+                  {features.map((feature, i) => (
+                    <li key={i}>{feature}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useImages } from '../context/ImagesContext';
+import { useImages } from '../hooks/useImages';
 
 const Navbar = () => {
   const { images } = useImages();
@@ -7,14 +7,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="logo">
-        {images.logo ? (
-          <img 
-            src={`http://localhost:5001${images.logo.imageUrl}`} 
-            alt="School Logo" 
-          />
-        ) : (
-          <span>Great Destiny Moulders</span>
-        )}
+        <img src={images.logo?.imageUrl} alt="Logo" />
       </div>
       <ul className="nav-links">
         <li><Link to="/">Home</Link></li>

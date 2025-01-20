@@ -1,37 +1,30 @@
 import PropTypes from 'prop-types';
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useState } from 'react';
 
-const ImagesContext = createContext();
+// Import all images
+import logo from '../assets/logo.png';
+import creche from '../assets/images/sections/preschool.jpeg';
+import preschool from '../assets/images/sections/preschool.jpeg';
+import nursery from '../assets/images/sections/nursery.jpeg';
+import kindergarten from '../assets/images/sections/preschool.jpeg';
+import primary from '../assets/images/sections/primary.jpeg';
+import afterSchool from '../assets/images/sections/afterschool 2.jpeg';
+
+export const ImagesContext = createContext();
 
 export const ImagesProvider = ({ children }) => {
-  const [images, setImages] = useState({
-    logo: null,
-    building: null,
-    creche: null,
-    preschool: null,
-    nursery: null,
-    kindergarten: null,
-    primary: null,
-    afterSchool: null
+  const [images] = useState({
+    logo: { imageUrl: logo },
+    creche: { imageUrl: creche },
+    preschool: { imageUrl: preschool },
+    nursery: { imageUrl: nursery },
+    kindergarten: { imageUrl: kindergarten },
+    primary: { imageUrl: primary },
+    afterSchool: { imageUrl: afterSchool }
   });
 
-  const fetchAllImages = async () => {
-    try {
-      const response = await fetch('http://localhost:5001/api/images/all');
-      if (!response.ok) throw new Error('Failed to fetch images');
-      const data = await response.json();
-      setImages(data);
-    } catch (error) {
-      console.error('Error fetching images:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllImages();
-  }, []);
-
   return (
-    <ImagesContext.Provider value={{ images, fetchAllImages }}>
+    <ImagesContext.Provider value={{ images }}>
       {children}
     </ImagesContext.Provider>
   );
@@ -39,6 +32,4 @@ export const ImagesProvider = ({ children }) => {
 
 ImagesProvider.propTypes = {
   children: PropTypes.node.isRequired,
-};
-
-export const useImages = () => useContext(ImagesContext); 
+}; 

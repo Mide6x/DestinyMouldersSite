@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiUploadCloud, FiTrash2, FiLogOut } from 'react-icons/fi';
 import imageCompression from 'browser-image-compression';
 import Toast from '../components/Toast';
+import { apiCall } from '../utils/api';
 
 const SECTIONS = {
   logo: 'School Logo',
@@ -23,11 +24,7 @@ const AdminDashboard = () => {
 
   const fetchAllImages = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/images/all');
-      if (!response.ok) {
-        throw new Error('Failed to fetch images');
-      }
-      const data = await response.json();
+      const data = await apiCall('/images/all');
       setImages(data);
     } catch (error) {
       showToast('Error fetching images: ' + error.message, 'error');
@@ -58,19 +55,10 @@ const AdminDashboard = () => {
     formData.append('section', section);
 
     try {
-      const response = await fetch('http://localhost:5001/api/upload/image', {
+      await apiCall('/upload/image', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        },
         body: formData
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Upload failed');
-      }
-
       showToast('Image uploaded successfully!');
       await fetchAllImages();
     } catch (error) {
@@ -85,15 +73,9 @@ const AdminDashboard = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/images/${section}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        }
+      await apiCall(`/images/${section}`, {
+        method: 'DELETE'
       });
-
-      if (!response.ok) throw new Error('Failed to delete image');
-      
       showToast('Image deleted successfully!');
       await fetchAllImages();
     } catch (error) {
@@ -155,7 +137,7 @@ const AdminDashboard = () => {
             <div className="image-preview">
               {images[key] ? (
                 <div className="image-container">
-                  <img src={`http://localhost:5001${images[key].imageUrl}`} alt={title} />
+                  <img src={`https://destinymoulderssite.onrender.com${images[key].imageUrl}`} alt={title} />
                   <div className="image-actions">
                     <label className="action-btn upload-btn">
                       <FiUploadCloud />

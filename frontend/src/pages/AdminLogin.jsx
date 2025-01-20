@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/admin.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const AdminLogin = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -14,15 +16,13 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5001/api/admin/login', {
+      const response = await fetch(`${API_URL}/admin/login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          username: 'greatdestinyadmin',
-          password: 'avmccmothers'
-        })
+        credentials: 'include',
+        body: JSON.stringify(credentials)
       });
 
       const data = await response.json();
@@ -48,6 +48,7 @@ const AdminLogin = () => {
         <input
           type="text"
           placeholder="Username"
+          value={credentials.username}
           onChange={(e) => setCredentials({...credentials, username: e.target.value})}
           disabled={loading}
           required
@@ -55,6 +56,7 @@ const AdminLogin = () => {
         <input
           type="password"
           placeholder="Password"
+          value={credentials.password}
           onChange={(e) => setCredentials({...credentials, password: e.target.value})}
           disabled={loading}
           required
